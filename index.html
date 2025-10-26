@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Ashu!</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Satoshi:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries (Standard CDN for maximum compatibility) -->
+    <!-- Three.js (Non-module, Global THREE) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.157.0/three.min.js"></script>
+    <!-- GSAP (Core) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Canvas-Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* Define Satoshi font face globally if not loaded via CDN link */
+        @font-face {
+            font-family: 'Satoshi';
+            src: url('https://cdn.fontshare.com/wf/55E75G6/74871/BCR0Y5P2.woff2') format('woff2'); /* Placeholder/Example URL, use local font if you have it */
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Satoshi';
+            src: url('https://cdn.fontshare.com/wf/55E75G6/74871/T75A5G2.woff2') format('woff2'); /* Placeholder/Example URL, use local font if you have it */
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #0c0a09;
+            overflow: hidden;
+            font-family: 'Satoshi', sans-serif;
+        }
+
+        .aurora {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        .aurora::before, .aurora::after {
+            content: '';
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            background-attachment: fixed;
+            animation: aurora-animation 40s infinite alternate; /* Slower animation */
+        }
+
+        .aurora::before {
+            background: 
+                radial-gradient(ellipse at top left, hsla(333,70%,55%,.4) 0%, transparent 50%),
+                radial-gradient(ellipse at top right, hsla(282, 82%, 54%, .3) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, hsla(210, 89%, 60%, .3) 0%, transparent 50%);
+        }
+
+        .aurora::after {
+            background: radial-gradient(ellipse at bottom right, hsla(35, 90%, 60%, .3) 0%, transparent 50%);
+            animation-delay: -15s;
+        }
+
+        @keyframes aurora-animation {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.1) translate(10px, -10px); }
+            100% { transform: scale(1) translate(-10px, 10px); }
+        }
+
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-satoshi { font-family: 'Satoshi', sans-serif; }
+
+        .text-gradient {
+            background: linear-gradient(to right, #f8cdda, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background-color: rgba(12, 10, 9, 0.5); /* Slightly darker background */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-glow {
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.5), 0 0 20px rgba(236, 72, 153, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.8), 0 0 30px rgba(236, 72, 153, 0.5);
+        }
+        
+        .btn-glow:active {
+            transform: translateY(1px) scale(1);
+        }
+
+        .progress-bar-track {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .polaroid-container {
+            transform-style: preserve-3d;
+        }
+        .polaroid {
+            transition: transform 0.5s;
+        }
+    </style>
+</head>
+
+<body class="text-gray-200">
+    <div class="aurora"></div>
+    <div id="three-canvas" class="fixed top-0 left-0 w-full h-full z-[-1]"></div>
+
+    <!-- Progress Bar -->
+    <div class="fixed top-4 left-1/2 -translate-x-1/2 w-1/3 max-w-sm h-2 rounded-full progress-bar-track z-50">
+        <div id="progressBar" class="h-full w-0 bg-gradient-to-r from-pink-500 to-red-500 rounded-full transition-all duration-500 ease-out"></div>
+    </div>
+    
+    <main class="h-screen w-full flex items-center justify-center p-4">
+        <!-- Steps Container -->
+        <div class="relative w-full h-full flex items-center justify-center">
+
+            <!-- Step 1: Welcome -->
+            <section id="step-1" class="step absolute w-full h-full flex flex-col items-center justify-center" style="visibility: hidden;">
+                <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-md w-full">
+                    <div id="heart-icon-1" class="text-7xl mb-4">❤️</div>
+                    <h1 class="text-4xl md:text-5xl font-playfair text-gradient mb-4">Hey Love,</h1>
+                    <p class="font-satoshi text-lg mb-8">I built a little world for you, just to bring a smile to your face on your special day.</p>
+                    <button class="next-btn bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-3 px-8 rounded-full btn-glow" data-next="2">Let's Begin</button>
+                </div>
+            </section>
+
+            <!-- Step 2: Core Message -->
+            <section id="step-2" class="step absolute w-full h-full flex flex-col items-center justify-center opacity-0" style="visibility: hidden;">
+                <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-md w-full">
+                    <div class="text-7xl mb-4">🎉</div>
+                    <h1 class="text-4xl md:text-5xl font-playfair text-gradient mb-4">Happy Birthday Ashu!</h1>
+                    <p class="font-satoshi text-lg mb-8">Another year of you making the world brighter. Your existence is a gift, and I'm so lucky to witness it.</p>
+                    <button class="next-btn bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-3 px-8 rounded-full btn-glow" data-next="3">There's more...</button>
+                </div>
+            </section>
+
+            <!-- Step 3: Reasons Why (Bento Grid) -->
+            <section id="step-3" class="step absolute w-full h-full flex flex-col items-center justify-center opacity-0" style="visibility: hidden;">
+                <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-3xl w-full mx-4">
+                    <h1 class="text-4xl md:text-5xl font-playfair text-gradient mb-8">A Few Things I Adore About You</h1>
+                    <div id="bento-grid" class="grid grid-cols-2 grid-rows-2 gap-4 text-left mb-8">
+                        <div class="col-span-2 card p-4 rounded-xl">
+                            <h2 class="font-bold text-lg mb-1 text-gradient">✨ Your Unmatched Kindness</h2>
+                            <p class="text-sm text-gray-300">The genuine warmth you show to everyone is something truly rare and beautiful.</p>
+                        </div>
+                        <div class="col-span-1 card p-4 rounded-xl">
+                            <h2 class="font-bold text-lg mb-1 text-gradient">😊 That Smile</h2>
+                            <p class="text-sm text-gray-300">It's a work of art.</p>
+                        </div>
+                        <div class="col-span-1 card p-4 rounded-xl">
+                            <h2 class="font-bold text-lg mb-1 text-gradient">🌟 Your Radiant Spirit</h2>
+                            <p class="text-sm text-gray-300">Your passion for life is infectious. Being around you makes everything feel more exciting and possible.</p>
+                        </div>
+                    </div>
+                    <button class="next-btn bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-3 px-8 rounded-full btn-glow" data-next="4">Remember this?</button>
+                </div>
+            </section>
+            
+            <!-- Step 4: Shared Memory -->
+            <section id="step-4" class="step absolute w-full h-full flex flex-col items-center justify-center opacity-0" style="visibility: hidden;">
+                <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
+                    <h1 class="text-4xl md:text-5xl font-playfair text-gradient mb-8">That One Time...</h1>
+                    <div class="polaroid-container perspective-[1000px] mb-8">
+                        <div id="polaroid" class="polaroid bg-white p-4 pb-16 rounded-lg shadow-xl relative inline-block" style="transform: rotateZ(-5deg); will-change: transform;">
+                            <a href="https://ibb.co/Wvh94tgY"><img src="https://i.ibb.co/hF65JfDt/7898bcda-6ec4-47d3-aa9f-71e954b535cb.jpg" alt="7898bcda-6ec4-47d3-aa9f-71e954b535cb" border="0" /></a> alt="Shared Memory" class="max-w-full h-auto">
+                            <p class="absolute bottom-4 left-4 font-playfair text-black text-lg">Our favorite memory.</p>
+                        </div>
+                    </div>
+                    <p class="font-satoshi text-lg mb-8">Every moment with you feels like a scene from a movie I'd watch on repeat.</p>
+                    <button class="next-btn bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-3 px-8 rounded-full btn-glow" data-next="5">One last thing...</button>
+                </div>
+            </section>
+
+            <!-- Step 5: Finale -->
+            <section id="step-5" class="step absolute w-full h-full flex flex-col items-center justify-center opacity-0" style="visibility: hidden;">
+                <div class="card p-8 md:p-12 rounded-2xl shadow-2xl text-center max-w-md w-full mx-4">
+                    <div class="text-7xl mb-4">🎂</div>
+                    <h1 class="text-4xl md:text-5xl font-playfair text-gradient mb-4">My Wish For You</h1>
+                    <p class="font-satoshi text-lg mb-8">May the next year bring you all the love, success, and pure happiness you so rightfully deserve. May your dreams soar higher than ever.</p>
+                    <div id="final-message" class="h-12 flex items-center justify-center">
+                        <p id="final-text" class="text-3xl font-bold text-pink-400 opacity-0" style="transform: translateY(20px);">Happy Birthday, my baby! ❤️</p>
+                    </div>
+                    <button id="celebrate-btn" class="bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-3 px-8 rounded-full btn-glow mt-4">Celebrate!</button>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <script>
+        // Use the globally exposed THREE object
+        let scene, camera, renderer, hearts = [];
+        const THREE = window.THREE; // Ensure global access
+
+        function initThree() {
+            const canvas = document.querySelector('#three-canvas');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            canvas.appendChild(renderer.domElement);
+
+            // Create a custom Heart Shape
+            const x = 0, y = 0;
+            const heartShape = new THREE.Shape();
+            heartShape.moveTo( x + 25, y + 25 );
+            heartShape.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y );
+            heartShape.bezierCurveTo( x - 30, y, x - 30, y + 35, x - 30, y + 35 );
+            heartShape.bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 );
+            heartShape.bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 );
+            heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
+            heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
+            
+            const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+            // Center the heart geometry
+            const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+            geometry.center(); 
+            
+            for (let i = 0; i < 25; i++) {
+                const material = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(`hsl(${330 + Math.random() * 30}, 100%, ${65 + Math.random() * 15}%)`),
+                    metalness: 0.7,
+                    roughness: 0.1,
+                    transparent: true,
+                    opacity: 0.8 + Math.random() * 0.2
+                });
+                const heart = new THREE.Mesh(geometry, material);
+                
+                heart.position.set(
+                    (Math.random() - 0.5) * 600,
+                    (Math.random() - 0.5) * 600,
+                    (Math.random() - 0.5) * 600
+                );
+                
+                const scale = 3 + Math.random() * 5; // Scale it up to be visible
+                heart.scale.set(scale, scale, scale);
+                heart.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                
+                heart.userData.initialPosition = heart.position.clone();
+                heart.userData.randomOffset = Math.random() * Math.PI * 2;
+                heart.userData.speed = 0.0005 + Math.random() * 0.0005;
+
+                hearts.push(heart);
+                scene.add(heart);
+            }
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(50, 50, 50);
+            scene.add(directionalLight);
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            camera.position.z = 300; // Move camera back to see the hearts
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = Date.now() * 0.0005;
+
+            hearts.forEach(heart => {
+                heart.position.y = heart.userData.initialPosition.y + Math.sin(time * heart.userData.speed * 1000 + heart.userData.randomOffset) * 40;
+                heart.rotation.y += heart.userData.speed * 10;
+                heart.rotation.z += heart.userData.speed * 10;
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+        
+        // Initialize Three.js after the DOM is ready
+        document.addEventListener('DOMContentLoaded', initThree);
+
+        
+        // GSAP Animations and Logic
+        const steps = document.querySelectorAll('.step');
+        const nextBtns = document.querySelectorAll('.next-btn');
+        const progressBar = document.getElementById('progressBar');
+        const totalSteps = steps.length;
+        let currentStep = 1;
+
+        function updateProgressBar() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            gsap.to(progressBar, { width: `${progress}%`, duration: 0.5, ease: 'power2.out' });
+        }
+
+        function animateInStep(stepElement) {
+            const elements = [...stepElement.querySelectorAll('h1, h2, p, button, .text-7xl, .polaroid-container')];
+            gsap.fromTo(elements, 
+                { opacity: 0, y: 30 }, 
+                { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out', delay: 0.2 }
+            );
+        }
+
+        function showStep(stepNumber) {
+            const current = document.getElementById(`step-${currentStep}`);
+            const next = document.getElementById(`step-${stepNumber}`);
+            
+            gsap.timeline()
+                // Transition out
+                .to(current, { opacity: 0, scale: 0.95, duration: 0.5, ease: 'power2.in', onComplete: () => current.style.visibility = 'hidden' })
+                // Transition in
+                .set(next, { visibility: 'visible', scale: 1.05, y: 20 })
+                .to(next, { opacity: 1, scale: 1, y: 0, duration: 0.7, ease: 'power2.out', onComplete: () => animateInStep(next) });
+            
+            currentStep = stepNumber;
+            updateProgressBar();
+        }
+
+        // Initial setup for Step 1
+        document.addEventListener('DOMContentLoaded', () => {
+            const step1 = document.getElementById('step-1');
+            step1.style.visibility = 'visible';
+            gsap.set(step1, { opacity: 1 });
+            
+            // Initial animation for Step 1
+            animateInStep(step1);
+            
+            // Pulsating heart icon
+            gsap.to("#heart-icon-1", { 
+                scale: 1.1, 
+                filter: "drop-shadow(0 0 10px rgba(255, 0, 100, 0.7))",
+                repeat: -1, 
+                yoyo: true, 
+                duration: 1.5, 
+                ease: "sine.inOut" 
+            });
+        });
+
+        nextBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const nextStep = parseInt(btn.dataset.next);
+                showStep(nextStep);
+            });
+        });
+
+        // Polaroid Hover Effect (Step 4)
+        const polaroid = document.getElementById('polaroid');
+        const polaroidContainer = document.querySelector('.polaroid-container');
+
+        if(polaroidContainer) {
+            polaroidContainer.addEventListener('mousemove', (e) => {
+                const rect = polaroidContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -5; // Subtle tilt
+                const rotateY = ((x - centerX) / centerX) * 5;
+                
+                gsap.to(polaroid, {
+                    rotationX: rotateX,
+                    rotationY: rotateY,
+                    rotationZ: -5, // Maintain initial tilt
+                    duration: 0.3,
+                    ease: 'power1.out',
+                    transformPerspective: 1000
+                });
+            });
+            
+            polaroidContainer.addEventListener('mouseleave', () => {
+                gsap.to(polaroid, {
+                    rotationX: 0,
+                    rotationY: 0,
+                    rotationZ: -5,
+                    duration: 0.5,
+                    ease: 'elastic.out(1, 0.5)'
+                });
+            });
+        }
+
+
+        // Celebrate Button Logic (Step 5)
+        const celebrateBtn = document.getElementById('celebrate-btn');
+        if(celebrateBtn) {
+            celebrateBtn.addEventListener('click', () => {
+                // 1. Button Fade Out
+                gsap.to(celebrateBtn, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.in', onComplete: () => celebrateBtn.disabled = true });
+                
+                // 2. Final Message In
+                gsap.to("#final-text", { opacity: 1, y: 0, duration: 1.2, ease: 'power2.out', delay: 0.3 });
+                
+                // 3. Confetti Sequence
+                const duration = 5 * 1000;
+                const animationEnd = Date.now() + duration;
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+                function randomInRange(min, max) {
+                  return Math.random() * (max - min) + min;
+                }
+
+                // Initial powerful bursts (Starts immediately)
+                confetti({
+                    particleCount: 200,
+                    startVelocity: 60,
+                    spread: 90,
+                    origin: { x: 0.1, y: 1 },
+                    zIndex: 1000
+                });
+                confetti({
+                    particleCount: 200,
+                    startVelocity: 60,
+                    spread: 90,
+                    origin: { x: 0.9, y: 1 },
+                    zIndex: 1000
+                });
+
+
+                // Continuous gentle shower
+                const interval = setInterval(function() {
+                  const timeLeft = animationEnd - Date.now();
+
+                  if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                  }
+
+                  const particleCount = 10;
+                  // Standard colorful confetti shower
+                  confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.2, 0.8), y: 0 } }));
+                  
+                  // Emoji confetti shower
+                  confetti({
+                    particleCount: 2,
+                    angle: randomInRange(55, 125),
+                    spread: randomInRange(50, 70),
+                    origin: { y: 0.6 },
+                    shapes: ['text'],
+                    scalar: 3,
+                    text: ['❤️', '💖', '✨'],
+                    zIndex: 1000
+                  });
+                }, 300);
+
+                // 4. Background 3D Hearts Finale
+                hearts.forEach(heart => {
+                    gsap.to(heart.position, {
+                        x: heart.position.x * 3,
+                        y: heart.position.y + 1000,
+                        z: heart.position.z * 3,
+                        duration: 5,
+                        ease: 'power2.inOut'
+                    });
+                    gsap.to(heart.material, {
+                        opacity: 0,
+                        duration: 5,
+                        ease: 'power2.inOut'
+                    });
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>
